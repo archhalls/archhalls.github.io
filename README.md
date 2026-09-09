@@ -3,7 +3,7 @@
 Готовый к заливке каталог. Работает без пересборки: данные — в CSV, фото — в папках.
 
 Сайт размещён **на двух площадках**:
-- **GitHub Pages** (основной): https://foolloader.github.io/archhalls/
+- **GitHub Pages** (основной): https://archhalls.github.io/
 - **Старый сервер** (пока): http://192.124.189.63
 
 ## Структура
@@ -54,7 +54,7 @@ python sync.py          # обновляет старый сервер (SSH)
 ### sync_github.py (GitHub Pages)
 - Пересобирает `photos.json`, делает коммит и пушит в GitHub.
 - Токен доступа лежит в `github_token.txt` (в `.gitignore`, на GitHub не попадает).
-- Адрес: https://foolloader.github.io/archhalls/
+- Адрес: https://archhalls.github.io/
 
 ### sync.py (старый сервер)
 - Заливает изменённые файлы по SSH на 192.124.189.63.

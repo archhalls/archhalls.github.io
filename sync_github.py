@@ -25,7 +25,7 @@ if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
 # ================= НАСТРОЙКИ =================
-REPO_URL = "https://github.com/foolloader/archhalls.git"
+REPO_URL = "https://github.com/archhalls/archhalls.github.io.git"
 BRANCH   = "main"
 # Токен читается из файла github_token.txt (в .gitignore, на GitHub не уходит)
 TOKEN_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'github_token.txt')
@@ -113,7 +113,7 @@ def main():
     run(['git', 'push', '-u', 'origin', BRANCH])
 
     print('Готово! GitHub Pages обновится через 1–2 минуты.')
-    print('Адрес: https://foolloader.github.io/archhalls/')
+    print('Адрес: https://archhalls.github.io/')
 
 
 if __name__ == '__main__':
