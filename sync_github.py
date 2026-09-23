@@ -99,15 +99,26 @@ def main():
     print('3) Добавляю изменения…')
     run(['git', 'add', '-A'])
 
-    # Проверяем, есть ли что коммитить
-    diff = run(['git', 'status', '--porcelain'])
-    if not diff.strip():
-        print('   Изменений нет — сайт уже актуален. Готово!')
+    # Незакоммиченные изменения в рабочей копии
+    diff = run(['git', 'status', '--porcelain']).strip()
+
+    # Есть ли уже неотправленные локальные коммиты (например, удаления строк CSV)
+    ahead = False
+    try:
+        ahead = int(run(['git', 'rev-list', '--count', '@{u}..HEAD']).strip() or 0) > 0
+    except Exception:
+        ahead = True  # нет upstream / не с чем сравнить — всё равно нужно запушить
+
+    if not diff and not ahead:
+        print('   Изменений и неопубликованных коммитов нет — сайт уже актуален. Готово!')
         return
 
-    msg = 'Обновление сайта ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
-    print(f'4) Коммит: {msg}')
-    run(['git', 'commit', '-m', msg])
+    if diff:
+        msg = 'Обновление сайта ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+        print(f'4) Коммит: {msg}')
+        run(['git', 'commit', '-m', msg])
+    else:
+        print('   Незакоммиченных изменений нет, но есть неотправленные коммиты — коммит пропускаю.')
 
     print('5) Пушу в GitHub…')
     run(['git', 'push', '-u', 'origin', BRANCH])
