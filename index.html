@@ -71,6 +71,10 @@ footer p{max-width:700px}
 .bar .bn{width:150px;color:var(--ink);flex:none}
 .bar .bb{height:9px;background:var(--acc);border-radius:2px;min-width:3px;opacity:.82}
 .bar .bv{color:var(--mut);font-size:12.5px}
+.regbar{display:flex;align-items:center;gap:10px;padding:16px 0 0;flex-wrap:wrap}
+.regbar label{font-size:12.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);font-weight:600}
+.regbar select{padding:8px 12px;border:1px solid var(--line);border-radius:3px;background:#fff;font:inherit;font-size:13.5px;color:var(--ink);cursor:pointer}
+.regbar select:focus{outline:none;border-color:var(--acc)}
 @media(max-width:760px){h1{font-size:36px}.wrap{padding:0 18px}#q{width:100%;margin:8px 0 0}
  .cap{text-align:left}.two{grid-template-columns:1fr;gap:28px}}
 </style>
@@ -91,12 +95,15 @@ footer p{max-width:700px}
 
 <header><div class="wrap">
 <div class="kick">Архитектура залов · выпуск 2025</div>
-<h1>Залы мира,<br>сданные в 2025 году</h1>
+<h1>Залы мира,<br>открытые в 2025 году</h1>
 <p class="lead" id="lead">Загрузка каталога…</p>
 <div class="stats" id="stats"></div>
 </div></header>
 
 <nav><div class="wrap navin" id="nav"></div></nav>
+<div class="wrap"><div class="regbar"><label for="reg">Регион</label>
+<select id="reg"><option value="">Все регионы</option></select>
+</div></div>
 <div class="wrap" id="content">
 <div class="nores" id="nr">Ничего не найдено. Попробуйте другой запрос.</div>
 </div>

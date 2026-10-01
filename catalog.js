@@ -112,7 +112,7 @@ function itemHTML(row){
     return '<img src="'+esc(p)+'" loading="lazy" onerror="this.style.display=\'none\'">';
   }).join('');
   var ph=photos?'<div class="photos">'+photos+'</div>':'';
-  return '<article class="item" data-s="'+esc(search)+'">'+
+  return '<article class="item" data-s="'+esc(search)+'" data-reg="'+esc(row[5]&&row[5].trim?row[5].trim():'')+'">'+
     '<div class="top"><div><div class="nm">'+nm+'</div><div class="loc">'+loc+'</div></div>'+capHTML(row[6])+'</div>'+
     ph+
     '<div class="meta">'+
@@ -127,28 +127,30 @@ function itemHTML(row){
 
 function build(data){
   var total=data.length;
-  var countries={}, totalSeats=0, withCap=0, withArch=0, withAcous=0;
-  var seatSec={'Концертные залы':1,'Театральные залы':1,'Музыкальные залы':1,'Лекционные залы':1,'Кинозалы':1,'Залы библиотек':1};
+  var countries={}, regions={};
   data.forEach(function(r){
     if(r[4]&&r[4].trim()&&r[4].trim()!=='н/д') countries[r[4].trim()]=1;
-    var n=capNum(r[6]);
-    if(n!=null){ withCap++; if(seatSec[r[0].trim()]) totalSeats+=n; }
-    if(r[7]&&r[7].trim()&&r[7].trim()!=='н/д') withArch++;
-    if(r[8]&&r[8].trim()&&r[8].trim()!=='н/д') withAcous++;
+    var reg=r[5]&&r[5].trim()?r[5].trim():'';
+    if(reg) regions[reg]=1;
   });
   document.getElementById('lead').innerHTML='Сводный каталог: <b>'+total+' зал</b> в <b>'+Object.keys(countries).length+' странах</b>, введённых в эксплуатацию или официально открытых в течение 2025 календарного года.';
   document.getElementById('stats').innerHTML=
-    st(total,'залов в каталоге')+st(Object.keys(countries).length,'страны')+
-    st(fmtNum(totalSeats),'мест в залах со сценой')+
-    st(Math.round(withCap/total*100)+'%','с вместимостью')+
-    st(Math.round(withArch/total*100)+'%','с автором проекта')+
-    st(Math.round(withAcous/total*100)+'%','с акустиком');
+    st(total,'залов в каталоге')+st(Object.keys(countries).length,'страны');
   function st(n,l){ return '<div class="st"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>'; }
+
+  // выпадающий список регионов
+  var regSel=document.getElementById('reg');
+  if(regSel){
+    Object.keys(regions).sort().forEach(function(reg){
+      var o=document.createElement('option');
+      o.value=reg; o.textContent=reg;
+      regSel.appendChild(o);
+    });
+  }
 
   var nav=document.getElementById('nav');
   SECTIONS.forEach(function(s){
-    var cnt=data.filter(function(r){return r[0].trim()===s[0];}).length;
-    nav.innerHTML+='<a href="#'+s[1]+'">'+esc(s[0])+'<span class="c">'+cnt+'</span></a>';
+    nav.innerHTML+='<a href="#'+s[1]+'">'+esc(s[0])+'</a>';
   });
   nav.innerHTML+='<input id="q" type="search" placeholder="Поиск: зал, город, бюро…" autocomplete="off">';
 
@@ -158,26 +160,28 @@ function build(data){
     if(!items.length) return;
     var body=items.map(itemHTML).join('');
     content.insertAdjacentHTML('beforeend',
-      '<section id="'+s[1]+'"><div class="shead"><h2>'+esc(s[0])+'</h2><span class="badge">'+items.length+'</span></div>'+
+      '<section id="'+s[1]+'"><div class="shead"><h2>'+esc(s[0])+'</h2></div>'+
       '<p class="sdesc">'+esc(s[2])+'</p>'+body+'</section>');
   });
 
   initLightbox();
 
-  // поиск
-  var q=document.getElementById('q'), items=document.querySelectorAll('.item'), nr=document.getElementById('nr');
-  q.addEventListener('input',function(){
-    var v=this.value.trim().toLowerCase(), shown=0;
+  // поиск + фильтр по региону
+  var q=document.getElementById('q'), reg=document.getElementById('reg'), items=document.querySelectorAll('.item'), nr=document.getElementById('nr');
+  function applyFilter(){
+    var v=(q?q.value:'').trim().toLowerCase(), rg=reg?reg.value:'', shown=0;
     items.forEach(function(it){
-      var ok=!v||it.dataset.s.indexOf(v)>-1;
+      var ok=(!v||it.dataset.s.indexOf(v)>-1) && (!rg||it.dataset.reg===rg);
       it.style.display=ok?'':'none'; if(ok)shown++;
     });
     document.querySelectorAll('section[id]').forEach(function(s){
       var vis=s.querySelectorAll('.item:not([style*="none"])').length;
-      s.style.display=(v&&!vis)?'none':'';
+      s.style.display=((v||rg)&&!vis)?'none':'';
     });
-    nr.style.display=(v&&!shown)?'block':'none';
-  });
+    nr.style.display=((v||rg)&&!shown)?'block':'none';
+  }
+  if(q) q.addEventListener('input',applyFilter);
+  if(reg) reg.addEventListener('change',applyFilter);
 }
 
 function initLightbox(){
